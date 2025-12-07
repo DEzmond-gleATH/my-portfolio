@@ -1,20 +1,39 @@
-import { kv } from "@vercel/kv";
+import { NextResponse } from "next/server";
 
-const KEY = "portfolio:views";
+const NAMESPACE = "faizan-portfolio";
+const KEY = "views";
+
+// make sure this route is always dynamic, not cached at build time
+export const dynamic = "force-dynamic";
+
+async function callCounterAPI(
+  mode: "hit" | "get"
+): Promise<number> {
+  const url = `https://api.countapi.xyz/${mode}/${NAMESPACE}/${KEY}`;
+
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+
+    if (!res.ok) {
+      console.error("Counter API error:", res.status, res.statusText);
+      return 0;
+    }
+
+    const data = await res.json();
+    const value = (data as any).value;
+    return typeof value === "number" ? value : 0;
+  } catch (err) {
+    console.error("Counter API fetch failed:", err);
+    return 0;
+  }
+}
 
 export async function POST() {
-  // increment counter and return the new value
-  const views = await kv.incr(KEY);
-  return new Response(JSON.stringify({ views }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  const views = await callCounterAPI("hit"); // increment + return
+  return NextResponse.json({ views });
 }
 
 export async function GET() {
-  const views = (await kv.get<number>(KEY)) ?? 0;
-  return new Response(JSON.stringify({ views }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  const views = await callCounterAPI("get"); // just read
+  return NextResponse.json({ views });
 }
