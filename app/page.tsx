@@ -513,7 +513,7 @@ function Projects() {
           title="Encrypted Traffic Anomaly Detection via TLS Metadata"
           description="Detected suspicious encrypted connections using only TLS metadata (packet counts, sizes, timing, flags) without decrypting payloads, comparing multiple tree-based models."
           stack="Python · scikit-learn · XGBoost · Random Forest · SMOTE · CESNET-TLS22"
-          githubUrl="https://github.com/DEzmond-gleATH"
+          githubUrl="https://github.com/DEzmond-gleATH/tls-metadata-anomaly-detection"
           imageSrc="/projects/tlsDetection.png"
           onImageClick={openLightbox}
         />
@@ -521,7 +521,7 @@ function Projects() {
           title="Credit Card Fraud Detection using ML"
           description="Implemented an end-to-end ML pipeline for fraud detection on a highly imbalanced credit card dataset, focusing on trade-offs between catching fraud and avoiding false alarms."
           stack="Python · pandas · scikit-learn · SMOTE · Random Forest · XGBoost · SVM"
-          githubUrl="https://github.com/DEzmond-gleATH"
+          githubUrl="https://github.com/DEzmond-gleATH/credit-card-fraud-detection"
           imageSrc="/projects/creditcard-fraud.png"
           onImageClick={openLightbox}
         />
@@ -762,6 +762,22 @@ function SkillCard({ title, items }: SkillCardProps) {
 /* ----------------------- Contact / Footer ----------------------- */
 
 function Contact({ particlesReady }: { particlesReady: boolean }) {
+  const [views, setViews] = useState<number | null>(null);
+
+  useEffect(() => {
+    const bumpViews = async () => {
+      try {
+        const res = await fetch("/api/views", { method: "POST" });
+        if (!res.ok) return;
+        const data = await res.json();
+        setViews(data.views ?? null);
+      } catch (err) {
+        console.error("Failed to update view counter", err);
+      }
+    };
+
+    bumpViews();
+  }, []);
   return (
     <section id="contact" className="contact-footer">
       {/* footer particles behind content */}
@@ -818,6 +834,12 @@ function Contact({ particlesReady }: { particlesReady: boolean }) {
         <p className="pt-6 text-center text-xs text-slate-500">
           © {new Date().getFullYear()} Syed Faizan Ahmed
         </p>
+        {views !== null && (
+          <p className="text-center text-[0.65rem] text-slate-600">
+            Views: {" "}
+            {views.toLocaleString("en-US")} times.
+          </p>
+          )}
       </div>
     </section>
   );
