@@ -278,7 +278,7 @@ function Hero({ particlesReady }: { particlesReady: boolean }) {
             <div className="relative overflow-hidden rounded-[2rem] hero-photo-frame">
               <div className="relative aspect-[3/4] w-full">
                 <Image
-                  src="/faizan.jpg"
+                  src="/faizan(1).png"
                   alt="Syed Faizan Ahmed"
                   fill
                   className="object-cover"
